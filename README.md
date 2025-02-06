@@ -6,7 +6,7 @@ PT站点自动批量下载种子
 * 设置延时，防止触发馒头限制
 * 排除正在做种
 * 排除零做种
-<img width="1440" alt="Image" src="https://github.com/AboutCXJ/PTool/main/img/Screen1.png" />
+<img width="1440" alt="Image" src="https://raw.githubusercontent.com/AboutCXJ/PTool/refs/heads/main/img/Screen1.png" />
 
 ### 使用
 * 安装[tampermonkey](https://www.tampermonkey.net/)
