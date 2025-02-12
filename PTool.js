@@ -381,30 +381,38 @@
         for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
 
+            let shoudleSkip = false;
+            let skipReason = "";
+
+            //排除正在做种的种子
+            if (data.seeding && excludeSeeding) {
+                shoudleSkip = true;
+                skipReason += "正在做种，";
+            }
+
+            //排除0做种的种子
+            if (data.seeders === "0" && excludeZeroSeeding) {
+                shoudleSkip = true;
+                skipReason += "0做种。";
+            }
+
             panelMessage(
                 `页：${currentPage}  种：${i + 1} 做种数：${
                     data.seeders
                 }  下载数：${data.leechers} 大小：${data.size} 做种：${
                     data.seeding
-                } <br /> ${data.title} <hr />`
+                }  跳过：${shoudleSkip} 原因：${skipReason} <br /> ${
+                    data.title
+                } <hr />`
             );
-            //panelMessage(`${data.title} <hr />`);
 
-            //排除正在做种的种子
-            if (data.seeding && excludeSeeding) {
-                continue;
-            }
-
-            //排除0做种的种子
-            if (data.seeders === "0" && excludeZeroSeeding) {
+            if (shoudleSkip) {
                 continue;
             }
 
             if (!dryRun) {
                 data.downloader.click();
             }
-
-
 
             downloadCount++;
 
@@ -446,13 +454,15 @@
 
     //入口函数
     async function begin() {
-        panelMessage(`页数：${totalPages}`);
-        panelMessage(`单种延时：${formatTime(singleSeedDelay)}`);
-        panelMessage(`多种延时：${formatTime(multipleSeedDelay)}`);
-        panelMessage(`翻页延时：${formatTime(pageDelay)}`);
-        panelMessage(`排除做种：${excludeSeeding}`);
-        panelMessage(`排除零做种：${excludeZeroSeeding}`);
-        panelMessage(`模拟运行：${dryRun} <hr />`);
+        panelMessage(
+            `<br />页数：${totalPages} <br /> 单种延时：${formatTime(
+                singleSeedDelay
+            )} <br /> 多种延时：${formatTime(
+                multipleSeedDelay
+            )} <br /> 翻页延时：${formatTime(
+                pageDelay
+            )} <br /> 排除做种：${excludeSeeding} <br /> 排除零做种：${excludeZeroSeeding} <br /> 模拟运行：${dryRun} <hr />`
+        );
 
         while (currentPage <= totalPages) {
             panelMessage(
