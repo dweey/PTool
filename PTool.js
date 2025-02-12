@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTool
 // @namespace    https://github.com/AboutCXJ
-// @version      2025-02-06
+// @version      2025-02-12
 // @description  PT站点自动批量下载种子
 // @author       AboutCXJ
 // @updateURL    https://raw.githubusercontent.com/AboutCXJ/PTool/main/PTool.js
@@ -294,7 +294,7 @@
         const timestamp = new Date().toLocaleString();
         logPanel.innerHTML += `<div>[${timestamp}]  ${message}</div>`;
         logPanel.scrollTop = logPanel.scrollHeight;
-        // console.log(`[${timestamp}]  ${message}`);
+        console.log(`[${timestamp}]  ${message}`);
     }
 
     // 移除日志面板
@@ -381,6 +381,15 @@
         for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
 
+            panelMessage(
+                `页：${currentPage}  种：${i + 1} 做种数：${
+                    data.seeders
+                }  下载数：${data.leechers} 大小：${data.size} 做种：${
+                    data.seeding
+                } <br /> ${data.title} <hr />`
+            );
+            //panelMessage(`${data.title} <hr />`);
+
             //排除正在做种的种子
             if (data.seeding && excludeSeeding) {
                 continue;
@@ -395,14 +404,7 @@
                 data.downloader.click();
             }
 
-            panelMessage(
-                `页：${currentPage}  种：${i + 1} 做种数：${
-                    data.seeders
-                }  下载数：${data.leechers} 大小：${data.size} 做种：${
-                    data.seeding
-                }`
-            );
-            panelMessage(`${data.title} <hr />`);
+
 
             downloadCount++;
 
