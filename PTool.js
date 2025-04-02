@@ -447,6 +447,11 @@
 
             downloadCount++;
 
+            // If we've reached or exceeded the target count, break out of the loop
+            if (downloadCount >= totalSeedCount) {
+                break;
+            }
+
             //每下载xxx个种子，暂停下载
             if (downloadCount % seedGap === 0) {
                 panelMessage(
@@ -495,9 +500,9 @@
             )} <br /> 排除做种：${excludeSeeding} <br /> 排除零做种：${excludeZeroSeeding} <br /> 模拟运行：${dryRun} <hr />`
         );
 
-        while (downloadCount <= totalSeedCount) {
+        while (downloadCount < totalSeedCount) {
             panelMessage(
-                `开始下载第${currentPage}页，共${totalPages}页。<hr />`
+                `开始下载第${currentPage}页，共${totalPages}页。目标下载数：${totalSeedCount}，已下载：${downloadCount}<hr />`
             );
             await downloadTorrents();
 
