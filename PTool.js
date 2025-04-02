@@ -17,14 +17,16 @@
 
     let DEBUG_MODE = false;
 
-    let totalPages = 1; //要下载的种子页数(1000个/每天,不要大于10页)
-    let singleSeedDelay = DEBUG_MODE ? 100 : 5000; //两种之间延时(ms)
-    let multipleSeedDelay = DEBUG_MODE ? 5 : 60 * 60 * 1000; //每下载100种延时
+    let totalPages = 10; //要下载的种子页数(1000个/每天,不要大于10页)
+    let totalSeedCount = 80; //要下载的种子数
+    let singleSeedDelay = DEBUG_MODE ? 100 : 3000; //两种之间延时(ms)
+    let multipleSeedDelay = DEBUG_MODE ? 5 : 5 * 60 * 1000; //每下载100种延时
 
     let pageDelay = 10000; //翻页延时
     let excludeSeeding = true; //排除正在做种的种子
     let excludeZeroSeeding = true; //排除0做种的种子
     let dryRun = true; //模拟运行
+    let cancelCompleted = false; //取消已完成
 
     let multiplePage = false; //是否多页下载
 
@@ -62,6 +64,7 @@
                 list: "tbody tr",
                 title: "td:nth-child(3)",
                 downloader: "td button",
+                liker: "td button:nth-child(2)",
                 progressBar: "div[aria-valuenow='100']",
                 size: "td div[class='mx-[-5px]']",
                 seeders: "td span[aria-label*='arrow-up'] + span",
@@ -138,6 +141,13 @@
             beginPanel.appendChild(createInputModule(pageInput, `下载几页：`));
         }
 
+        //下载种子数
+        const seedInput = document.createElement("input");
+        seedInput.type = "number";
+        seedInput.max = 1000;
+        seedInput.value = totalSeedCount;
+        beginPanel.appendChild(createInputModule(seedInput, `下载种子数：`));
+
         //种之间延时输入框
         const singleSeedDelayInput = document.createElement("input");
         singleSeedDelayInput.type = "number";
@@ -186,6 +196,12 @@
         dryRunCheck.checked = dryRun;
         beginPanel.appendChild(createInputModule(dryRunCheck, `模拟运行:`));
 
+        //取消已完成
+        const cancelCompletedCheck = document.createElement("input");
+        cancelCompletedCheck.type = "checkbox";
+        cancelCompletedCheck.checked = cancelCompleted;
+        beginPanel.appendChild(createInputModule(cancelCompletedCheck, `<收藏页>做种中取消收藏:`));
+
         //开始按钮
         const beginButton = document.createElement("button");
         beginButton.innerText = "开始";
@@ -209,6 +225,7 @@
             excludeSeeding = excludeSeedingCheck.checked;
             excludeZeroSeeding = excludeZeroSeedingCheck.checked;
             dryRun = dryRunCheck.checked;
+            cancelCompleted = cancelCompletedCheck.checked;
 
             if (
                 singleSeedDelay < 0 ||
@@ -343,6 +360,7 @@
             }
 
             data.downloader = element.querySelector(selector.downloader);
+            data.liker = element.querySelector(selector.liker);
 
             let progress = element.querySelector(selector.progressBar);
             if (progress) {
@@ -396,13 +414,25 @@
                 skipReason += "0做种。";
             }
 
+            //取消已完成
+            if(cancelCompleted){
+                if (data.seeding) {
+                    shoudleSkip = false;
+                } else {
+                    shoudleSkip = true;
+                    skipReason += "未下载。";
+                }
+            }
+
+
             panelMessage(
                 `页：${currentPage}  种：${i + 1} 做种数：${
                     data.seeders
-                }  下载数：${data.leechers} 大小：${data.size} 做种：${
+                } 已经下载 ${downloadCount} 个种子 <br /> 
+                 下载数：${data.leechers} 大小：${data.size} 做种：${
                     data.seeding
                 }  跳过：${shoudleSkip} 原因：${skipReason} <br /> ${
-                    data.title
+                    data.title.length > 80 ? data.title.substring(0, 80) + '...' : data.title
                 } <hr />`
             );
 
@@ -411,7 +441,8 @@
             }
 
             if (!dryRun) {
-                data.downloader.click();
+                // data.downloader.click();
+                data.liker.click();
             }
 
             downloadCount++;
@@ -464,7 +495,7 @@
             )} <br /> 排除做种：${excludeSeeding} <br /> 排除零做种：${excludeZeroSeeding} <br /> 模拟运行：${dryRun} <hr />`
         );
 
-        while (currentPage <= totalPages) {
+        while (downloadCount <= totalSeedCount) {
             panelMessage(
                 `开始下载第${currentPage}页，共${totalPages}页。<hr />`
             );
