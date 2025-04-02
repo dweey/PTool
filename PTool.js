@@ -219,6 +219,7 @@
         beginButton.addEventListener("click", () => {
             loadLogPanel();
             totalPages = pageInput.value || totalPages;
+            totalSeedCount = seedInput.value || totalSeedCount; //目标下载数
             singleSeedDelay = singleSeedDelayInput.value * 1000;
             multipleSeedDelay = multipleSeedDelayInput.value * 1000 * 60;
             pageDelay = pageDelayInput.value * 1000;
