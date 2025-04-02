@@ -474,18 +474,17 @@
     async function goToNextPage() {
         const nextPageButton = document.querySelector(selector.nextPage);
 
-        if (nextPageButton) {
+        if (nextPageButton && !nextPageButton.disabled && !nextPageButton.classList.contains('disabled')) {
             nextPageButton.click();
             panelMessage(
                 `翻到第${currentPage + 1}页。等待${formatTime(pageDelay)}。`
             );
             await new Promise((resolve) => setTimeout(resolve, pageDelay));
+            return true;
         } else {
-            panelMessage("未找到翻页按钮！");
+            panelMessage("未找到翻页按钮或翻页按钮已禁用！");
             return false;
         }
-
-        return true;
     }
 
     //入口函数
@@ -505,6 +504,11 @@
                 `开始下载第${currentPage}页，共${totalPages}页。目标下载数：${totalSeedCount}，已下载：${downloadCount}<hr />`
             );
             await downloadTorrents();
+
+            // If we've reached or exceeded the target count, break out of the loop
+            if (downloadCount >= totalSeedCount) {
+                break;
+            }
 
             if (currentPage < totalPages) {
                 const hasNextPage = await goToNextPage();
