@@ -288,7 +288,7 @@
 
         logPanel = document.createElement("div");
         logPanel.style.position = "fixed";
-        logPanel.style.bottom = "10px";
+        logPanel.style.bottom = "200px";
         logPanel.style.right = "10px";
         logPanel.style.width = "500px";
         logPanel.style.height = "200px";
