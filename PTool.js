@@ -20,17 +20,17 @@
     let totalPages = 10; //要下载的种子页数(1000个/每天,不要大于10页)
     let totalSeedCount = 80; //要下载的种子数
     let singleSeedDelay = DEBUG_MODE ? 100 : 3000; //两种之间延时(ms)
-    let multipleSeedDelay = DEBUG_MODE ? 5 : 5 * 60 * 1000; //每下载100种延时
+    let multipleSeedDelay = DEBUG_MODE ? 5 : 55 * 60 * 1000; //每下载100种延时
 
     let pageDelay = 10000; //翻页延时
     let excludeSeeding = true; //排除正在做种的种子
     let excludeZeroSeeding = true; //排除0做种的种子
-    let dryRun = true; //模拟运行
+    let dryRun = false; //模拟运行
     let cancelCompleted = false; //取消已完成
 
     let multiplePage = false; //是否多页下载
 
-    let seedGap = 110; //间隔多少个种子触发一次大延时
+    let seedGap = 105; //间隔多少个种子触发一次大延时
 
     let currentPage = 1;
     let downloadCount = 0;
@@ -233,7 +233,7 @@
                 multipleSeedDelay < 0 ||
                 pageDelay < 0 ||
                 totalPages < 1 ||
-                totalPages > 10
+                totalPages > 100
             ) {
                 panelMessage(
                     "请输入正确的参数！馒头限制：100种/小时，1000种/天. "
