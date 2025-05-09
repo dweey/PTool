@@ -17,7 +17,7 @@
 
     let DEBUG_MODE = false;
 
-    let totalPages = 10; //要下载的种子页数(1000个/每天,不要大于10页)
+    let totalPages = 100; //要下载的种子页数(1000个/每天,不要大于10页)
     let totalSeedCount = 80; //要下载的种子数
     let singleSeedDelay = DEBUG_MODE ? 100 : 3000; //两种之间延时(ms)
     let multipleSeedDelay = DEBUG_MODE ? 5 : 55 * 60 * 1000; //每下载100种延时
@@ -30,7 +30,7 @@
 
     let multiplePage = false; //是否多页下载
 
-    let seedGap = 105; //间隔多少个种子触发一次大延时
+    let seedGap = 145; //间隔多少个种子触发一次大延时
 
     let currentPage = 1;
     let downloadCount = 0;
@@ -133,20 +133,28 @@
         document.body.appendChild(beginPanel);
 
         //页数输入框
-        const pageInput = document.createElement("input");
-        pageInput.type = "number";
-        pageInput.max = 10;
-        pageInput.value = totalPages;
-        if (multiplePage) {
-            beginPanel.appendChild(createInputModule(pageInput, `下载几页：`));
-        }
+        // const pageInput = document.createElement("input");
+        // pageInput.type = "number";
+        // pageInput.max = 10;
+        // pageInput.value = totalPages;
+        // if (multiplePage) {
+        //     beginPanel.appendChild(createInputModule(pageInput, `下载几页：`));
+        // }
 
         //下载种子数
         const seedInput = document.createElement("input");
         seedInput.type = "number";
-        seedInput.max = 1000;
+        seedInput.max = 1500;
         seedInput.value = totalSeedCount;
         beginPanel.appendChild(createInputModule(seedInput, `下载种子数：`));
+
+        //百种延时
+        const multipleSeedDelayInput = document.createElement("input");
+        multipleSeedDelayInput.type = "number";
+        multipleSeedDelayInput.value = multipleSeedDelay / 1000 / 60;
+        beginPanel.appendChild(
+            createInputModule(multipleSeedDelayInput, `每下载` + seedGap + `种，等待:(分)`)
+        );
 
         //种之间延时输入框
         const singleSeedDelayInput = document.createElement("input");
@@ -155,14 +163,6 @@
         singleSeedDelayInput.value = singleSeedDelay / 1000;
         beginPanel.appendChild(
             createInputModule(singleSeedDelayInput, `单种延时:(秒)`)
-        );
-
-        //百种延时
-        const multipleSeedDelayInput = document.createElement("input");
-        multipleSeedDelayInput.type = "number";
-        multipleSeedDelayInput.value = multipleSeedDelay / 1000 / 60;
-        beginPanel.appendChild(
-            createInputModule(multipleSeedDelayInput, `多种延时:(分)`)
         );
 
         //翻页延时
@@ -215,10 +215,24 @@
         beginButton.style.margin = "5px 0";
         beginPanel.appendChild(beginButton);
 
+        //开始按钮
+        const stopButton = document.createElement("button");
+        stopButton.innerText = "暂停";
+        stopButton.style.width = "100%";
+        stopButton.style.padding = "5px";
+        stopButton.style.backgroundColor = "white";
+        stopButton.style.color = "black";
+        stopButton.style.border = "none";
+        stopButton.style.borderRadius = "5px";
+        stopButton.style.cursor = "pointer";
+        stopButton.style.margin = "5px 0";
+        stopButton.style.display = "none";
+        beginPanel.appendChild(stopButton);
+
         // 按钮点击事件
         beginButton.addEventListener("click", () => {
             loadLogPanel();
-            totalPages = pageInput.value || totalPages;
+            totalPages = totalPages;
             totalSeedCount = seedInput.value || totalSeedCount; //目标下载数
             singleSeedDelay = singleSeedDelayInput.value * 1000;
             multipleSeedDelay = multipleSeedDelayInput.value * 1000 * 60;
@@ -228,23 +242,38 @@
             dryRun = dryRunCheck.checked;
             cancelCompleted = cancelCompletedCheck.checked;
 
-            if (
-                singleSeedDelay < 0 ||
-                multipleSeedDelay < 0 ||
-                pageDelay < 0 ||
-                totalPages < 1 ||
-                totalPages > 100
-            ) {
-                panelMessage(
-                    "请输入正确的参数！馒头限制：100种/小时，1000种/天. "
-                );
-                return;
-            }
+            // Make panel semi-transparent
+            beginPanel.style.opacity = "0.5";
 
-            beginPanel.style.display = "none";
+            // Disable all input fields and checkboxes in the panel
+            const inputs = beginPanel.querySelectorAll("input, select, textarea");
+            inputs.forEach(el => {
+                if (el !== beginButton) {
+                    el.disabled = true;
+                }
+            });
+
+            beginButton.style.display = "none";
+            stopButton.style.display = "block";
 
             clearLogPanel();
             begin();
+        });
+
+        stopButton.addEventListener("click", () => {
+            beginPanel.style.opacity = "1";
+            // Disable all input fields and checkboxes in the panel
+            const inputs = beginPanel.querySelectorAll("input, select, textarea, button");
+            inputs.forEach(el => {
+                if (el !== beginButton) {
+                    el.disabled = false;
+                }
+            });
+
+            beginButton.style.display = "block";
+            stopButton.style.display = "none";
+            totalSeedCount = downloadCount
+            panelMessage("已停止");
         });
 
         //
@@ -338,9 +367,8 @@
             const hours = Math.floor(totalSeconds / 3600);
             const minutes = Math.floor((totalSeconds % 3600) / 60);
             const seconds = totalSeconds % 60;
-            return `${hours} 小时${minutes > 0 ? ` ${minutes} 分钟` : ""}${
-                seconds > 0 ? ` ${seconds} 秒` : ""
-            }`;
+            return `${hours} 小时${minutes > 0 ? ` ${minutes} 分钟` : ""}${seconds > 0 ? ` ${seconds} 秒` : ""
+                }`;
         }
     }
 
@@ -397,7 +425,8 @@
     async function downloadTorrents() {
         const datas = preprocessingDatas();
 
-        for (let i = 0; i < datas.length; i++) {
+        let start = downloadCount % 100;
+        for (let i = start; i < datas.length; i++) {
             const data = datas[i];
 
             let shoudleSkip = false;
@@ -416,7 +445,7 @@
             }
 
             //取消已完成
-            if(cancelCompleted){
+            if (cancelCompleted) {
                 if (data.seeding) {
                     shoudleSkip = false;
                 } else {
@@ -427,13 +456,10 @@
 
 
             panelMessage(
-                `页：${currentPage}  种：${i + 1} 做种数：${
-                    data.seeders
+                `页：${currentPage}  种：${i + 1} 做种数：${data.seeders
                 } 已经下载 ${downloadCount} 个种子 <br /> 
-                 下载数：${data.leechers} 大小：${data.size} 做种：${
-                    data.seeding
-                }  跳过：${shoudleSkip} 原因：${skipReason} <br /> ${
-                    data.title.length > 80 ? data.title.substring(0, 80) + '...' : data.title
+                 下载数：${data.leechers} 大小：${data.size} 做种：${data.seeding
+                }  跳过：${shoudleSkip} 原因：${skipReason} <br /> ${data.title.length > 80 ? data.title.substring(0, 80) + '...' : data.title
                 } <hr />`
             );
 
@@ -525,7 +551,7 @@
 
         //恢复初始状态
         currentPage = 1;
-        downloadCount = 0;
+        // downloadCount = 0;
         beginPanel.style.display = "block";
     }
 
