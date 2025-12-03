@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTool
 // @namespace    https://github.com/dweey/PTool
-// @version      2026-12-03
+// @version      2026-12-04
 // @description  PT站点自动批量下载种子
 // @author       dweey
 // @updateURL    https://raw.githubusercontent.com/dweey/PTool/main/PTool2.js
@@ -425,8 +425,7 @@
     async function downloadTorrents() {
         const datas = preprocessingDatas();
 
-        let start = downloadCount % 100;
-        for (let i = start; i < datas.length; i++) {
+        for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
 
             let shoudleSkip = false;
