@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTool
 // @namespace    https://github.com/dweey/PTool
-// @version      2026-12-04
+// @version      2026-12-05
 // @description  PT站点自动批量下载种子
 // @author       dweey
 // @updateURL    https://raw.githubusercontent.com/dweey/PTool/main/PTool2.js
@@ -25,7 +25,7 @@
     let pageDelay = 10000; //翻页延时
     let excludeSeeding = true; //排除正在做种的种子
     let excludeZeroSeeding = true; //排除0做种的种子
-    let dryRun = false; //模拟运行
+    let reSeedMode = false; //补种模式
     let cancelCompleted = false; //取消已完成
 
     let multiplePage = false; //是否多页下载
@@ -65,6 +65,7 @@
                 title: "td:nth-child(3)",
                 downloader: "td button",
                 liker: "td button:nth-child(2)",
+                finshNoSeeding: "div[style*='background: rgb(158, 158, 158)']",
                 progressBar: "div.ant-progress-bg.ant-progress-bg-outer[style*='--progress-percent: 1']:not([style*='background: rgb(158, 158, 158)'])",
                 size: "td div[class='mx-[-5px]']",
                 seeders: "td span[aria-label*='arrow-up'] + span",
@@ -76,6 +77,7 @@
                 list: "table[class='torrents'] > tbody > tr",
                 title: "table[class='torrentname'] tr td",
                 downloader: "table[class='torrentname'] tr td[width] a",
+                finshNoSeeding: "div[style*='background: rgb(158, 158, 158)']",
                 progressBar: "div[title*=seeding]",
                 size: "td:nth-child(5)",
                 seeders: "td:nth-child(6)",
@@ -191,10 +193,10 @@
         );
 
         //模拟运行
-        const dryRunCheck = document.createElement("input");
-        dryRunCheck.type = "checkbox";
-        dryRunCheck.checked = dryRun;
-        beginPanel.appendChild(createInputModule(dryRunCheck, `模拟运行:`));
+        const reSeedModeCheck = document.createElement("input");
+        reSeedModeCheck.type = "checkbox";
+        reSeedModeCheck.checked = reSeedMode;
+        beginPanel.appendChild(createInputModule(reSeedModeCheck, `补种模式:`));
 
         //取消已完成
         const cancelCompletedCheck = document.createElement("input");
@@ -239,7 +241,7 @@
             pageDelay = pageDelayInput.value * 1000;
             excludeSeeding = excludeSeedingCheck.checked;
             excludeZeroSeeding = excludeZeroSeedingCheck.checked;
-            dryRun = dryRunCheck.checked;
+            reSeedMode = reSeedModeCheck.checked;
             cancelCompleted = cancelCompletedCheck.checked;
 
             // Make panel semi-transparent
@@ -397,6 +399,14 @@
             } else {
                 data.seeding = false;
             }
+            let finshNoSeeding = element.querySelector(selector.finshNoSeeding);
+            if (reSeedMode) {
+                if (finshNoSeeding) {
+                    data.seeding = false;
+                }else {
+                    data.seeding = true;
+                }
+            }
 
             let size = element.querySelector(selector.size);
             if (size) {
@@ -466,7 +476,7 @@
                 continue;
             }
 
-            if (!dryRun) {
+            if (1) {
                 // data.downloader.click();
                 data.liker.click();
             }
@@ -522,7 +532,7 @@
                 multipleSeedDelay
             )} <br /> 翻页延时：${formatTime(
                 pageDelay
-            )} <br /> 排除做种：${excludeSeeding} <br /> 排除零做种：${excludeZeroSeeding} <br /> 模拟运行：${dryRun} <hr />`
+            )} <br /> 排除做种：${excludeSeeding} <br /> 排除零做种：${excludeZeroSeeding} <br />`
         );
 
         while (downloadCount < totalSeedCount) {
