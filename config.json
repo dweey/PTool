@@ -1,0 +1,27 @@
+{
+    "rss": {
+        "urls": [
+            ""
+        ]
+    },
+    "transmission": {
+        "server": "http://127.0.0.1",
+        "port": 9091,
+        "rpc_path": "/transmission/rpc",
+        "username": "admin",
+        "password": ""
+    },
+    "download": {
+        "directory": "/data2/complete"
+    },
+    "cache": {
+        "directory": "/tmp/fengqi-transmission-rss"
+    },
+    "options": {
+        "sleep_interval": 2,
+        "timeout": {
+            "rss": 20,
+            "transmission": 10
+        }
+    }
+}
