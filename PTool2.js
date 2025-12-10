@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTool
 // @namespace    https://github.com/dweey/PTool
-// @version      2026-12-05
+// @version      2026-12-10
 // @description  PT站点自动批量下载种子
 // @author       dweey
 // @updateURL    https://raw.githubusercontent.com/dweey/PTool/main/PTool2.js
@@ -18,11 +18,11 @@
     let DEBUG_MODE = false;
 
     let totalPages = 100; //要下载的种子页数(1000个/每天,不要大于10页)
-    let totalSeedCount = 80; //要下载的种子数
-    let singleSeedDelay = DEBUG_MODE ? 100 : 3000; //两种之间延时(ms)
+    let totalSeedCount = 75; //要下载的种子数
+    let singleSeedDelay = DEBUG_MODE ? 100 : 4000; //两种之间延时(ms)
     let multipleSeedDelay = DEBUG_MODE ? 5 : 55 * 60 * 1000; //每下载100种延时
 
-    let pageDelay = 10000; //翻页延时
+    let pageDelay = 15000; //翻页延时
     let excludeSeeding = true; //排除正在做种的种子
     let excludeZeroSeeding = true; //排除0做种的种子
     let reSeedMode = false; //补种模式
@@ -192,7 +192,7 @@
             createInputModule(excludeZeroSeedingCheck, `排除零做种:`)
         );
 
-        //模拟运行
+        //补种模式
         const reSeedModeCheck = document.createElement("input");
         reSeedModeCheck.type = "checkbox";
         reSeedModeCheck.checked = reSeedMode;
