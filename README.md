@@ -7,8 +7,8 @@ PT站点自动批量收藏种子，
 用于批量收藏下载小种进行保种，提高时魔
 
 ## 对比原始方案的改动
-用馒头的收藏rss功能+ qb，transmission 的rss下载功能,配合下种保种
-trrss.php transmission本身不支持下载订阅，这个脚本可以单独运行,直接下载订阅到transmission，需要有一定php基础，参考原大佬的代码，进行了配置文件 config.json 的剥离, 相比qb订阅，查重使用了guid，避免了qb因为同文件名跳过下载的bug
+* 用馒头的收藏rss功能+ qb，transmission 的rss下载功能,配合下种保种
+* trrss.php transmission本身不支持下载订阅，这个脚本可以单独运行,直接下载订阅到transmission，需要有一定php基础，参考原大佬的代码，进行了配置文件 config.json 的剥离, 相比qb订阅，查重使用了guid，避免了qb因为同文件名跳过下载的bug
 
 ### 特性
 * 馒头收藏多页种子 仅适配老版ui ob.m-team
